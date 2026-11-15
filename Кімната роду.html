@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Кімната роду</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap">
+<style>
+:root {
+  /* Layout: a white, slide-like stage under the znohub browser bar; the purple gradient appears only at the big moments (start, room cleared, door open). */
+  --violet: #9A28E0;
+  --violet-2: #B449E2;
+  --violet-ink: #6E1BA8;
+  --lilac: #F4DAFF;
+  --lilac-soft: #F6E7FE;
+  --ink: #140B19;
+  --muted: #6C5F77;
+  --paper: #FFFFFF;
+  --line: #ECDDF5;
+  --ok: #1F9D50;
+  --ok-ink: #157A3D;
+  --ok-soft: #E3F6EA;
+  --bad: #DD3F45;
+  --bad-ink: #B8242B;
+  --bad-soft: #FDE9E9;
+  --font-display: "Google Sans", "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-body: "Google Sans", "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color-scheme: light;
+}
+@property --p { syntax: "<number>"; inherits: false; initial-value: 0; }
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; background: var(--paper); }
+body {
+  margin: 0; min-height: 100%;
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+}
+h1, h2, p { margin: 0; }
+button { font: inherit; color: inherit; touch-action: manipulation; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 12px 16px 48px; display: flex; flex-direction: column; gap: 20px; }
+
+/* ---------- browser bar (as on every znohub slide) ---------- */
+.bar { display: flex; align-items: center; gap: 14px; background: var(--lilac); border-radius: 999px; padding: 9px 18px; }
+.dots { display: flex; gap: 6px; flex: none; }
+.dots i { display: block; width: 11px; height: 11px; border-radius: 50%; }
+.dots i:nth-child(1) { background: #EC6C60; }
+.dots i:nth-child(2) { background: #EBC06B; }
+.dots i:nth-child(3) { background: #5FC756; }
+.logo { flex: none; display: inline-flex; align-items: baseline; font-family: var(--font-display); font-weight: 700; font-size: 23px; line-height: 1; letter-spacing: -0.035em; color: #0B0A0B; }
+.logo svg { width: .56em; height: .56em; margin: 0 .02em; flex: none; }
+.bar-mid { flex: 1; min-width: 0; text-align: center; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-num { flex: none; font-size: 15px; color: var(--violet-2); font-variant-numeric: tabular-nums; }
+
+/* ---------- screens ---------- */
+.screen { display: flex; flex-direction: column; gap: 20px; animation: rise .35s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ---------- purple hero (gradient + dot matrix + side pills) ---------- */
+.hero {
+  --hp: 22px;
+  position: relative; overflow: hidden; isolation: isolate;
+  border-radius: 30px; color: #fff; padding: 34px var(--hp) 30px;
+  background:
+    radial-gradient(70% 60% at 82% 88%, rgba(140, 62, 190, .7), transparent 70%),
+    radial-gradient(60% 55% at 8% 4%, rgba(198, 86, 246, .55), transparent 70%),
+    linear-gradient(172deg, #A934DB 0%, #9030C8 30%, #5F1F82 66%, #2A0B37 100%);
+}
+.matrix { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.hero-in { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.tag { display: inline-block; background: #FFEAFF; color: #8C24C9; font-size: 14px; font-weight: 500; line-height: 1; padding: 8px 14px; border-radius: 999px; }
+.pillrow { align-self: stretch; display: flex; align-items: stretch; gap: clamp(10px, 3vw, 22px); margin-inline: calc(-1 * var(--hp)); }
+.side { flex: 1 1 0; min-width: 16px; background: rgba(255, 255, 255, .22); }
+.side.l { border-radius: 0 999px 999px 0; }
+.side.r { border-radius: 999px 0 0 999px; }
+.bigpill {
+  flex: none; max-width: 84%;
+  background: #fff; color: #A030E0;
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 8vw, 56px);
+  line-height: 1.12; letter-spacing: -0.02em;
+  padding: .3em .85em .34em; border-radius: 999px;
+  box-shadow: 0 12px 30px -12px rgba(30, 0, 50, .6);
+}
+.bigpill.letter { min-width: 2.3em; text-align: center; font-size: clamp(46px, 12vw, 72px); padding: .16em .6em .2em; }
+.bigpill.word6 { letter-spacing: .12em; padding-inline: .7em .58em; perspective: 300px; }
+.word6 span { display: inline-block; animation: drop .5s cubic-bezier(.2, .9, .3, 1.3) both; animation-delay: calc(var(--i) * 110ms + 200ms); }
+@keyframes drop { from { opacity: 0; transform: translateY(-14px) rotateX(80deg); } to { opacity: 1; transform: none; } }
+.pop { animation: pop .6s cubic-bezier(.2, .9, .3, 1.3) .1s both; }
+@keyframes pop { from { opacity: 0; transform: scale(.5) rotate(-6deg); } to { opacity: 1; transform: none; } }
+.hero-sub { font-size: clamp(17px, 2.8vw, 21px); font-weight: 500; text-wrap: balance; }
+
+/* ---------- start ---------- */
+.h2 { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; text-wrap: balance; }
+.steps { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+.step { display: flex; align-items: center; gap: 14px; background: var(--lilac-soft); border-radius: 26px; padding: 9px 18px 9px 9px; }
+.badge {
+  flex: none; width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: linear-gradient(160deg, #A93BE6 0%, #8A1FDB 100%);
+  color: #fff; font-weight: 700; font-size: 17px; line-height: 1;
+}
+.fine { text-align: center; color: var(--muted); font-size: 14px; }
+
+/* ---------- door code ---------- */
+.codebox { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; border: 1.5px dashed #DDBDF0; border-radius: 24px; padding: 14px 18px; }
+.code-head { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.code-head svg { width: 22px; height: 22px; color: var(--violet); flex: none; }
+.code { display: flex; gap: 8px; perspective: 400px; }
+.slot {
+  width: 40px; height: 50px; border-radius: 12px; border: 2px dashed #D7B5EC; background: #fff;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 24px; color: var(--violet);
+}
+.slot.on { border: 2px solid var(--violet); background: var(--lilac-soft); }
+.slot.new { animation: flip .7s cubic-bezier(.2, .9, .3, 1.25) .35s both; }
+@keyframes flip { 0% { transform: rotateX(-100deg); background: var(--violet); color: #fff; } 60% { background: var(--violet); color: #fff; } 100% { transform: none; } }
+.code.mini { gap: 4px; }
+.code.mini .slot { width: 22px; height: 28px; border-radius: 7px; border-width: 1.5px; font-size: 14px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  appearance: none; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 56px; padding: 0 30px; border-radius: 999px;
+  font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #fff;
+  background: linear-gradient(160deg, #AC3DE8 0%, #8A1FDB 100%);
+  box-shadow: 0 10px 22px -10px rgba(138, 31, 219, .8);
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.btn:active { transform: translateY(1px); box-shadow: 0 4px 12px -6px rgba(138, 31, 219, .8); }
+.btn:focus-visible, .opt:focus-visible { outline: 3px solid #EBC06B; outline-offset: 3px; }
+.btn.block { width: 100%; }
+.btn.ghost { background: var(--lilac-soft); color: var(--violet-ink); box-shadow: none; }
+
+/* ---------- question ---------- */
+.roomline { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.room-k { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--muted); }
+.rdots { display: inline-flex; gap: 5px; }
+.rdots i { display: block; width: 9px; height: 9px; border-radius: 50%; background: #E9D6F5; }
+.rdots i.cur { background: var(--violet); box-shadow: 0 0 0 3px rgba(154, 40, 224, .18); }
+.rdots i.ok { background: var(--ok); }
+.rdots i.bad { background: var(--bad); }
+.room-name { font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.2; }
+.track { height: 6px; border-radius: 99px; background: #F0E4F8; overflow: hidden; margin-top: -6px; }
+.track span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #B449E2, #8A1FDB); transition: width .45s ease; }
+.slide { display: flex; flex-direction: column; gap: 18px; }
+.qhead { display: flex; align-items: center; gap: 18px; padding: 18px 0; border-top: 1px solid #D9CFE0; border-bottom: 1px solid var(--line); }
+.qmark {
+  flex: none; width: 66px; height: 66px; border-radius: 50%;
+  display: grid; place-items: center; padding-bottom: 2px;
+  font-family: var(--font-display); font-weight: 700; font-size: 40px; line-height: 1; color: #fff;
+  background:
+    radial-gradient(circle at 50% 50%, #9A16DA 0 54%, transparent 55%),
+    radial-gradient(circle at 35% 28%, #E7A6FF 0%, #B03CF0 45%, #8A12D0 100%);
+  box-shadow: inset 0 -4px 8px rgba(70, 0, 110, .45), 0 8px 16px -8px rgba(130, 20, 200, .7);
+  text-shadow: 0 2px 2px rgba(60, 0, 100, .45);
+}
+.qtext { min-width: 0; }
+.qlabel { font-weight: 700; font-size: 16px; }
+.word { font-family: var(--font-display); font-size: clamp(40px, 11vw, 62px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; margin-top: 2px; overflow-wrap: anywhere; outline: none; }
+.word.in { animation: rise .3s ease both; }
+.note { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 14px; background: #FFEAFF; color: #8C24C9; font-weight: 500; font-size: 14px; }
+.opts { display: grid; gap: 12px; }
+.opt {
+  appearance: none; width: 100%; cursor: pointer; text-align: left;
+  display: flex; align-items: center; gap: 16px;
+  min-height: 58px; padding: 8px 22px 8px 8px;
+  background: var(--lilac-soft); border: 2px solid transparent; border-radius: 999px;
+  font-size: 18px;
+  transition: background .15s, border-color .15s, opacity .2s, transform .1s;
+}
+.opt:hover:not(:disabled) { background: #F0D8FD; border-color: #DDB0F5; }
+.opt:active:not(:disabled) { transform: scale(.99); }
+.opt:disabled { cursor: default; }
+.opt .badge { width: 42px; height: 42px; font-size: 18px; }
+.opt .mark { margin-left: auto; font-weight: 700; font-size: 20px; line-height: 1; }
+.opt.is-right { background: var(--ok-soft); border-color: var(--ok); }
+.opt.is-right .badge { background: var(--ok); }
+.opt.is-right .mark { color: var(--ok); }
+.opt.is-wrong { background: var(--bad-soft); border-color: var(--bad); animation: shake .35s ease; }
+.opt.is-wrong .badge { background: var(--bad); }
+.opt.is-wrong .mark { color: var(--bad); }
+.opt.dim { opacity: .45; }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.fb { border-radius: 24px; padding: 16px 20px; display: grid; gap: 6px; animation: rise .3s ease both; }
+.fb.ok { background: var(--ok-soft); }
+.fb.bad { background: var(--bad-soft); }
+.fb-t { font-family: var(--font-display); font-weight: 700; font-size: 19px; }
+.fb.ok .fb-t { color: var(--ok-ink); }
+.fb.bad .fb-t { color: var(--bad-ink); }
+.fb em, .mi-r em { font-style: italic; font-weight: 500; }
+.fb-x { font-size: 15px; color: var(--muted); }
+.actions { display: flex; justify-content: flex-end; }
+
+/* ---------- room cleared ---------- */
+.rscore { display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.rscore .num { font-family: var(--font-display); font-weight: 700; font-size: 34px; line-height: 1.1; color: var(--violet); font-variant-numeric: tabular-nums; }
+.rscore .cap { color: var(--muted); }
+
+/* ---------- final ---------- */
+.result { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.ring {
+  --p: 0; position: relative; flex: none; width: 144px; height: 144px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: conic-gradient(var(--violet) calc(var(--p) * 1%), #F0E4F8 0);
+  transition: --p 1.1s cubic-bezier(.2, .8, .2, 1);
+}
+.ring::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #fff; }
+.ring > div { position: relative; display: grid; justify-items: center; text-align: center; }
+.ring .big { font-family: var(--font-display); font-weight: 700; font-size: 30px; letter-spacing: -0.02em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.ring .cap { font-size: 12px; line-height: 1.2; color: var(--muted); max-width: 92px; }
+.verdict { flex: 1 1 240px; display: grid; gap: 6px; }
+.v-title { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1.25; text-wrap: balance; }
+.v-sub { color: var(--muted); font-size: 16px; }
+.btnrow { display: flex; gap: 12px; flex-wrap: wrap; }
+.btnrow .btn { flex: 1 1 220px; }
+.copyfall { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+.copyfall textarea { font: inherit; font-size: 15px; color: var(--ink); border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 12px; resize: none; }
+.block { display: grid; gap: 12px; }
+.mist { display: grid; gap: 10px; }
+.mi { border: 1.5px solid var(--line); border-radius: 20px; padding: 14px 18px; display: grid; gap: 6px; }
+.mi-top { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 14px; flex-wrap: wrap; }
+.mi-w { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.mi-n { font-weight: 500; font-size: 15px; color: var(--muted); }
+.mi-a { font-size: 15px; }
+.mi-a s { color: var(--bad); }
+.mi-a b { color: var(--ok-ink); }
+.mi-r { font-size: 15px; color: #4A3F52; }
+.perfect { background: var(--ok-soft); color: var(--ok-ink); border-radius: 20px; padding: 14px 18px; font-weight: 500; }
+.cs { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.cs-i { background: var(--lilac-soft); border-radius: 22px; padding: 14px 18px; display: grid; gap: 4px; align-content: start; font-size: 15px; }
+.cs-t { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--violet-ink); }
+.cs-x { color: #4A3F52; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- small screens ---------- */
+@media (max-width: 520px) {
+  .actions .btn { width: 100%; }
+}
+@media (max-width: 420px) {
+  .bar { gap: 10px; padding: 8px 14px; }
+  .logo { font-size: 20px; }
+  .bar-mid { font-size: 12.5px; }
+  .hero { --hp: 16px; padding-top: 28px; padding-bottom: 26px; border-radius: 26px; }
+  .qhead { gap: 14px; }
+  .qmark { width: 54px; height: 54px; font-size: 32px; }
+  .opt { font-size: 17px; min-height: 54px; gap: 14px; }
+  .opt .badge { width: 38px; height: 38px; }
+  .slot { width: 38px; height: 46px; font-size: 22px; }
+  .codebox { padding: 14px 16px; }
+}
+@media (max-width: 350px) {
+  .bar-mid { display: none; }
+  .bar-num { margin-left: auto; }
+  .slot { width: 34px; height: 42px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="logo" aria-label="znohub.">zn<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="currentColor"/><path d="M10 7.2 15 12l-5 4.8" fill="none" stroke="#F4DAFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>hub.</span>
+    <span class="bar-mid">українська мова</span>
+    <span class="bar-num" id="counter" aria-label="Номер запитання">00/24</span>
+  </header>
+
+  <main>
+    <!-- START -->
+    <section class="screen" id="s-start">
+      <div class="hero">
+        <canvas class="matrix" aria-hidden="true"></canvas>
+        <div class="hero-in">
+          <span class="tag">гра на 5 хвилин</span>
+          <div class="pillrow"><span class="side l"></span><h1 class="bigpill">Кімната роду</h1><span class="side r"></span></div>
+          <p class="hero-sub">Рід незмінюваних іменників</p>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="h2">Як грати</h2>
+        <ol class="steps">
+          <li class="step"><span class="badge">1</span><span>У кожній із 6 кімнат на вас чекають 4 слова.</span></li>
+          <li class="step"><span class="badge">2</span><span>Визначте рід кожного: чоловічий, жіночий чи середній.</span></li>
+          <li class="step"><span class="badge">3</span><span>За кожну пройдену кімнату ви отримаєте літеру коду. Зберіть усі шість, щоб відчинити двері.</span></li>
+        </ol>
+      </div>
+
+      <div class="codebox">
+        <div class="code-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg>
+          <span>Код від дверей</span>
+        </div>
+        <div class="code" id="code-start" aria-label="Код від дверей: ще не знайдено жодної літери"></div>
+      </div>
+
+      <button type="button" class="btn block" id="btn-start">Почати гру</button>
+      <p class="fine">24 запитання · близько 5 хвилин</p>
+    </section>
+
+    <!-- QUESTION -->
+    <section class="screen" id="s-q" hidden>
+      <div class="roomline">
+        <div>
+          <div class="room-k"><span id="q-roomk">Кімната 1 з 6</span><span class="rdots" id="q-rdots" aria-hidden="true"></span></div>
+          <div class="room-name" id="q-room">Речі</div>
+        </div>
+        <div class="code mini" id="code-q" aria-hidden="true"></div>
+      </div>
+      <div class="track" aria-hidden="true"><span id="q-track"></span></div>
+
+      <div class="slide">
+        <div class="qhead">
+          <span class="qmark" aria-hidden="true">?</span>
+          <div class="qtext">
+            <p class="qlabel">Якого роду іменник?</p>
+            <p class="word" id="q-word" tabindex="-1">кашне</p>
+            <span class="note" id="q-note" hidden></span>
+          </div>
+        </div>
+        <div class="opts" id="q-opts" role="group" aria-label="Варіанти відповіді"></div>
+      </div>
+
+      <div class="fb" id="q-fb" role="status" aria-live="polite" hidden></div>
+      <div class="actions"><button type="button" class="btn" id="btn-next" hidden>Далі</button></div>
+    </section>
+
+    <!-- ROOM CLEARED -->
+    <section class="screen" id="s-room" hidden>
+      <div class="hero">
+        <canvas class="matrix" aria-hidden="true"></canvas>
+        <div class="hero-in">
+          <span class="tag" id="r-tag">Кімнату пройдено</span>
+          <div class="pillrow"><span class="side l"></span><div class="bigpill letter" id="r-letter">З</div><span class="side r"></span></div>
+          <p class="hero-sub">Нова літера коду від дверей</p>
+        </div>
+      </div>
+      <div class="rscore"><span class="num" id="r-score">4 з 4</span><span class="cap">правильних відповідей у цій кімнаті</span></div>
+      <div class="codebox">
+        <div class="code-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg>
+          <span>Код від дверей</span>
+        </div>
+        <div class="code" id="code-room"></div>
+      </div>
+      <button type="button" class="btn block" id="btn-room">Наступна кімната</button>
+    </section>
+
+    <!-- FINAL -->
+    <section class="screen" id="s-final" hidden>
+      <div class="hero">
+        <canvas class="matrix" aria-hidden="true"></canvas>
+        <div class="hero-in">
+          <span class="tag">Двері відчинено</span>
+          <div class="pillrow"><span class="side l"></span><div class="bigpill word6" id="f-code" aria-label="Код: ЗНОХАБ">ЗНОХАБ</div><span class="side r"></span></div>
+          <p class="hero-sub">Ви пройшли всі 6 кімнат і зібрали код</p>
+        </div>
+      </div>
+
+      <div class="result">
+        <div class="ring" id="f-ring"><div><span class="big" id="f-score">0/24</span><span class="cap">правильних відповідей</span></div></div>
+        <div class="verdict">
+          <p class="v-title" id="f-verdict"></p>
+          <p class="v-sub" id="f-time"></p>
+          <p class="v-sub">Напишіть у групі, скільки правильних відповідей із 24 ви дали.</p>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button type="button" class="btn" id="btn-copy">Скопіювати результат</button>
+        <button type="button" class="btn ghost" id="btn-again">Зіграти ще раз</button>
+      </div>
+      <div class="copyfall" id="copyfall" hidden>
+        <label for="copytext">Скопіюйте текст вручну:</label>
+        <textarea id="copytext" rows="2" readonly></textarea>
+      </div>
+
+      <section class="block">
+        <h2 class="h2" id="f-mist-h">Робота над помилками</h2>
+        <div class="mist" id="f-mist"></div>
+      </section>
+
+      <section class="block">
+        <h2 class="h2">Шпаргалка: як визначити рід</h2>
+        <div class="cs">
+          <div class="cs-i">
+            <p class="cs-t">Особи → за статтю</p>
+            <p>фрау, мадемуазель, леді, мадам&nbsp;— ж.&nbsp;р.; маестро, месьє, денді&nbsp;— ч.&nbsp;р.</p>
+            <p class="cs-x">Деякі професії&nbsp;— ч.&nbsp;р.: аташе, папараці, портьє, кюре.</p>
+          </div>
+          <div class="cs-i">
+            <p class="cs-t">Тварини → зазвичай ч.&nbsp;р.</p>
+            <p>шимпанзе, кенгуру, какаду, боа (змія), фламінго</p>
+            <p class="cs-x">Винятки жіночого роду: цеце (муха); риби івасі, фугу, путасу, гурамі, гупі.</p>
+          </div>
+          <div class="cs-i">
+            <p class="cs-t">Неістоти → с.&nbsp;р.</p>
+            <p>таксі, кашпо, кашне, бюро, боа (шарф), бра (лампа), авокадо, журі, піаніно, лібрето</p>
+            <p class="cs-x">Крім назв мов (гінді&nbsp;— ж.&nbsp;р.), вітрів (грего, майстро, памперо, солано, сироко, торнадо&nbsp;— ч.&nbsp;р.) і сирів (брі, сулугуні&nbsp;— ч.&nbsp;р.).</p>
+          </div>
+          <div class="cs-i">
+            <p class="cs-t">Географічні назви → за загальною назвою</p>
+            <p>Тбілісі (місто)&nbsp;— с.&nbsp;р.; Міссісіпі (річка), Чилі (держава)&nbsp;— ж.&nbsp;р.; Борнео (острів)&nbsp;— ч.&nbsp;р.</p>
+          </div>
+          <div class="cs-i">
+            <p class="cs-t">Абревіатури → за головним словом</p>
+            <p>СОТ (Світова організація торгівлі)&nbsp;— ж.&nbsp;р.</p>
+            <p class="cs-x">Але ЮНЕСКО, НАТО&nbsp;— с.&nbsp;р. Відмінювані (ЦУМ, неп, ТЮГ)&nbsp;— за схожістю з іменниками, переважно ч.&nbsp;р.</p>
+          </div>
+          <div class="cs-i">
+            <p class="cs-t">Запам’ятайте</p>
+            <p>Ж.&nbsp;р.: авеню, альма-матер, бере, кольрабі, броколі, салямі, бері-бері.</p>
+            <p class="cs-x">Ч.&nbsp;р.: бенді, кантрі, шимі, багі.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const GL = { m: 'Чоловічий рід', f: 'Жіночий рід', n: 'Середній рід' };
+  const gl = (g) => GL[g].toLowerCase();
+  const OPTS = ['m', 'f', 'n'];
+  const LETTERS = ['А', 'Б', 'В'];
+  const CODE = ['З', 'Н', 'О', 'Х', 'А', 'Б'];
+
+  const ROOMS = [
+    { name: 'Люди', words: [
+      { w: 'мадемуазель', g: 'f', rule: 'Назви осіб — за статтю: мадемуазель — жінка, тому жіночий рід.', ex: 'чарівна мадемуазель' },
+      { w: 'месьє', g: 'm', rule: 'Назви осіб — за статтю: месьє — чоловік, тому чоловічий рід.', ex: 'ввічливий месьє' },
+      { w: 'папараці', g: 'm', rule: 'Деякі назви професій (аташе, папараці, портьє, кюре) — чоловічого роду.', ex: 'настирливий папараці' },
+      { w: 'журі', g: 'n', rule: 'Пастка! Хоч у журі є люди, це назва неістоти, тому середній рід.', ex: 'журі оголосило переможців' }
+    ] },
+    { name: 'Тварини', words: [
+      { w: 'фламінго', g: 'm', rule: 'Назви тварин — зазвичай чоловічого роду.', ex: 'рожевий фламінго' },
+      { w: 'боа', note: 'змія', g: 'm', rule: 'Боа-змія — назва тварини, тому чоловічий рід.', ex: 'великий боа' },
+      { w: 'цеце', g: 'f', rule: 'Цеце (муха) — виняток, який треба запам’ятати: жіночий рід.', ex: 'небезпечна цеце' },
+      { w: 'гупі', g: 'f', rule: 'Назви риб гупі, івасі, фугу, путасу, гурамі — винятки: жіночий рід.', ex: 'яскрава гупі' }
+    ] },
+    { name: 'Речі', words: [
+      { w: 'авокадо', g: 'n', rule: 'Назви неістот — середнього роду.', ex: 'стигле авокадо' },
+      { w: 'бра', g: 'n', rule: 'Бра (лампа) — назва неістоти, тому середній рід.', ex: 'настінне бра' },
+      { w: 'піаніно', g: 'n', rule: 'Назва неістоти — середній рід.', ex: 'старе піаніно' },
+      { w: 'броколі', g: 'f', rule: 'Броколі й кольрабі (капуста) — винятки, які треба запам’ятати: жіночий рід.', ex: 'свіжа броколі' }
+    ] },
+    { name: 'Карта світу', words: [
+      { w: 'Тбілісі', note: 'місто', g: 'n', rule: 'Рід географічної назви — за загальною назвою: місто — середній рід, тому й Тбілісі теж.', ex: 'старовинне Тбілісі' },
+      { w: 'Міссісіпі', note: 'річка', g: 'f', rule: 'Рід географічної назви — за загальною назвою: річка — жіночий рід, тому й Міссісіпі теж.', ex: 'повноводна Міссісіпі' },
+      { w: 'Чилі', note: 'держава', g: 'f', rule: 'Рід географічної назви — за загальною назвою: держава — жіночий рід, тому й Чилі теж.', ex: 'далека Чилі' },
+      { w: 'Борнео', note: 'острів', g: 'm', rule: 'Рід географічної назви — за загальною назвою: острів — чоловічий рід, тому й Борнео теж.', ex: 'тропічний Борнео' }
+    ] },
+    { name: 'Абревіатури', words: [
+      { w: 'СОТ', note: 'Світова організація торгівлі', g: 'f', rule: 'Рід абревіатури — за головним словом: організація — жіночий рід.', ex: 'СОТ ухвалила рішення' },
+      { w: 'НАТО', g: 'n', rule: 'Особливий випадок: НАТО схоже на звичайні іменники середнього роду, тому середній рід.', ex: 'НАТО ухвалило рішення' },
+      { w: 'ЮНЕСКО', g: 'n', rule: 'Особливий випадок: ЮНЕСКО схоже на звичайні іменники середнього роду, тому середній рід.', ex: 'ЮНЕСКО затвердило список' },
+      { w: 'ТЮГ', g: 'm', rule: 'Відмінювані абревіатури (ЦУМ, неп, ТЮГ) визначаємо за схожістю зі звичайними іменниками — переважно це чоловічий рід.', ex: 'новий ТЮГ' }
+    ] },
+    { name: 'Пастки', words: [
+      { w: 'боа', note: 'шарф', g: 'n', rule: 'Пастка! Боа-шарф — назва неістоти, тому середній рід.', ex: 'пухнасте боа' },
+      { w: 'гінді', g: 'f', rule: 'Назви мов — жіночого роду.', ex: 'сучасна гінді' },
+      { w: 'сироко', g: 'm', rule: 'Назви вітрів (грего, майстро, памперо, солано, сироко, торнадо) — чоловічого роду.', ex: 'гарячий сироко' },
+      { w: 'брі', g: 'm', rule: 'Назви сирів (брі, сулугуні) — чоловічого роду.', ex: 'французький брі' }
+    ] }
+  ];
+
+  const WORDS = [];
+  ROOMS.forEach((r, ri) => r.words.forEach((w) => { w.room = ri; w.id = WORDS.length; WORDS.push(w); }));
+  const TOTAL = WORDS.length;
+  const PER = 4;
+
+  const $ = (id) => document.getElementById(id);
+  const pad = (n) => String(n).padStart(2, '0');
+  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function shuffle(list) {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  function fresh(screen) {
+    return {
+      v: 2,
+      screen,
+      order: ROOMS.map((r, ri) => shuffle(WORDS.filter((w) => w.room === ri).map((w) => w.id))),
+      room: 0, pos: 0, answers: {},
+      startedAt: screen === 'q' ? Date.now() : null, finishedAt: null
+    };
+  }
+  function valid(s) {
+    return !!s && typeof s === 'object' && s.v === 2 &&
+      ['start', 'q', 'room', 'final'].includes(s.screen) &&
+      Array.isArray(s.order) && s.order.length === ROOMS.length &&
+      s.order.every((a, ri) => Array.isArray(a) && a.length === PER && a.every((id) => WORDS[id] && WORDS[id].room === ri)) &&
+      Number.isInteger(s.room) && s.room >= 0 && s.room < ROOMS.length &&
+      Number.isInteger(s.pos) && s.pos >= 0 && s.pos < PER &&
+      !!s.answers && typeof s.answers === 'object';
+  }
+
+  let state = fresh('start');
+
+  const curId = () => state.order[state.room][state.pos];
+  const qNum = () => state.room * PER + state.pos + 1;
+  const answered = (id) => Object.prototype.hasOwnProperty.call(state.answers, id);
+  const isRight = (id) => state.answers[id] === WORDS[id].g;
+  const score = () => WORDS.filter((w) => answered(w.id) && isRight(w.id)).length;
+
+  function show(name) {
+    ['start', 'q', 'room', 'final'].forEach((n) => { $('s-' + n).hidden = n !== name; });
+  }
+  function renderCode(el, filled, fresh) {
+    el.innerHTML = CODE.map((ch, i) =>
+      `<span class="slot${i < filled ? ' on' : ''}${i === fresh ? ' new' : ''}">${i < filled ? ch : ''}</span>`).join('');
+  }
+  function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+  function render() {
+    show(state.screen);
+    if (state.screen === 'start') {
+      $('counter').textContent = '00/' + TOTAL;
+      renderCode($('code-start'), 0, -1);
+    } else if (state.screen === 'q') renderQ();
+    else if (state.screen === 'room') renderRoom();
+    else renderFinal();
+    requestAnimationFrame(drawAll);
+  }
+
+  function renderQ() {
+    const id = curId();
+    const w = WORDS[id];
+    $('counter').textContent = pad(qNum()) + '/' + TOTAL;
+    $('q-roomk').textContent = `Кімната ${state.room + 1} з ${ROOMS.length}`;
+    $('q-room').textContent = ROOMS[state.room].name;
+    $('q-track').style.width = ((qNum() - 1) / TOTAL * 100) + '%';
+    renderCode($('code-q'), state.room, -1);
+    $('q-rdots').innerHTML = state.order[state.room].map((wid, i) => {
+      let cls = '';
+      if (answered(wid)) cls = isRight(wid) ? 'ok' : 'bad';
+      else if (i === state.pos) cls = 'cur';
+      return `<i class="${cls}"></i>`;
+    }).join('');
+
+    const wordEl = $('q-word');
+    if (wordEl.textContent !== w.w) { wordEl.textContent = w.w; restart(wordEl, 'in'); }
+    const note = $('q-note');
+    note.hidden = !w.note;
+    note.textContent = w.note || '';
+
+    const ans = answered(id) ? state.answers[id] : null;
+    $('q-opts').innerHTML = OPTS.map((g, i) => {
+      let cls = 'opt';
+      let mark = '';
+      let sr = '';
+      if (ans) {
+        if (g === w.g) { cls += ' is-right'; mark = '<span class="mark" aria-hidden="true">✓</span>'; sr = '<span class="sr"> (правильна відповідь)</span>'; }
+        else if (g === ans) { cls += ' is-wrong'; mark = '<span class="mark" aria-hidden="true">✕</span>'; sr = '<span class="sr"> (ваша відповідь)</span>'; }
+        else cls += ' dim';
+      }
+      return `<button type="button" class="${cls}" data-g="${g}"${ans ? ' disabled' : ''}><span class="badge" aria-hidden="true">${LETTERS[i]}</span><span>${GL[g]}${sr}</span>${mark}</button>`;
+    }).join('');
+
+    const fb = $('q-fb');
+    const nx = $('btn-next');
+    if (ans) {
+      const ok = ans === w.g;
+      fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+      fb.innerHTML =
+        `<p class="fb-t">${ok ? 'Правильно!' : 'Неправильно. Це ' + gl(w.g) + '.'}</p>` +
+        `<p>${esc(w.rule)}</p>` +
+        `<p>Наприклад: <em>${esc(w.ex)}</em>.</p>`;
+      fb.hidden = false;
+      nx.hidden = false;
+      nx.textContent = state.pos === PER - 1 ? 'Отримати літеру коду' : 'Далі';
+    } else {
+      fb.hidden = true;
+      fb.innerHTML = '';
+      nx.hidden = true;
+    }
+  }
+
+  function renderRoom() {
+    const r = state.room;
+    $('counter').textContent = pad((r + 1) * PER) + '/' + TOTAL;
+    $('r-tag').textContent = `Кімнату «${ROOMS[r].name}» пройдено`;
+    const L = $('r-letter');
+    L.textContent = CODE[r];
+    restart(L, 'pop');
+    const right = state.order[r].filter((id) => answered(id) && isRight(id)).length;
+    $('r-score').textContent = `${right} з ${PER}`;
+    renderCode($('code-room'), r + 1, r);
+    $('btn-room').textContent = r < ROOMS.length - 1 ? 'Наступна кімната' : 'Відчинити двері';
+  }
+
+  function verdict(s) {
+    if (s === TOTAL) return 'Ідеально! Жодної помилки.';
+    if (s >= 20) return 'Чудовий результат! Ще трохи — і буде ідеально.';
+    if (s >= 14) return 'Непогано! Перегляньте розбір помилок і спробуйте ще раз.';
+    return 'Варто повторити правила. Шпаргалка й розбір помилок — нижче.';
+  }
+  function duration() {
+    if (!state.startedAt) return '';
+    const sec = Math.max(0, Math.round(((state.finishedAt || Date.now()) - state.startedAt) / 1000));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return 'Ваш час: ' + (m ? `${m} хв ${s} с` : `${s} с`);
+  }
+
+  function renderFinal() {
+    $('counter').textContent = TOTAL + '/' + TOTAL;
+    const s = score();
+    $('f-score').textContent = `${s}/${TOTAL}`;
+    $('f-verdict').textContent = verdict(s);
+    $('f-time').textContent = duration();
+    $('f-code').innerHTML = CODE.map((ch, i) => `<span style="--i:${i}" aria-hidden="true">${ch}</span>`).join('');
+    const ring = $('f-ring');
+    const pct = (s / TOTAL * 100).toFixed(1);
+    if (reduced()) ring.style.setProperty('--p', pct);
+    else {
+      ring.style.setProperty('--p', 0);
+      requestAnimationFrame(() => requestAnimationFrame(() => ring.style.setProperty('--p', pct)));
+    }
+
+    const wrong = state.order.flat().filter((id) => !isRight(id));
+    $('f-mist-h').textContent = wrong.length ? `Робота над помилками (${wrong.length})` : 'Робота над помилками';
+    $('f-mist').innerHTML = wrong.length
+      ? wrong.map((id) => {
+          const w = WORDS[id];
+          const a = answered(id) ? gl(state.answers[id]) : 'без відповіді';
+          return `<article class="mi">
+            <div class="mi-top">
+              <span class="mi-w">${esc(w.w)}${w.note ? ` <span class="mi-n">(${esc(w.note)})</span>` : ''}</span>
+              <span class="mi-a"><span class="sr">Ваша відповідь: </span><s>${a}</s><span aria-hidden="true"> → </span><span class="sr">, правильна: </span><b>${gl(w.g)}</b></span>
+            </div>
+            <p class="mi-r">${esc(w.rule)} Наприклад: <em>${esc(w.ex)}</em>.</p>
+          </article>`;
+        }).join('')
+      : '<p class="perfect">Жодної помилки. Ви справжній знавець роду!</p>';
+    $('copyfall').hidden = true;
+  }
+
+  /* ---------- actions ---------- */
+  function toTop() { window.scrollTo(0, 0); }
+  function focusWord() { $('q-word').focus({ preventScroll: true }); }
+
+  function startGame() {
+    state = fresh('q');
+    render();
+    toTop();
+    focusWord();
+  }
+  function answer(g) {
+    const id = curId();
+    if (answered(id)) return;
+    state.answers[id] = g;
+    renderQ();
+    const nx = $('btn-next');
+    nx.focus({ preventScroll: true });
+    requestAnimationFrame(() => {
+      const box = nx.getBoundingClientRect();
+      if (box.bottom > window.innerHeight - 8) nx.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'end' });
+    });
+  }
+  function next() {
+    if (state.screen !== 'q' || !answered(curId())) return;
+    if (state.pos < PER - 1) {
+      state.pos += 1;
+      render();
+      toTop();
+      focusWord();
+    } else {
+      state.screen = 'room';
+      render();
+      toTop();
+      $('btn-room').focus({ preventScroll: true });
+    }
+  }
+  function leaveRoom() {
+    if (state.room < ROOMS.length - 1) {
+      state.room += 1;
+      state.pos = 0;
+      state.screen = 'q';
+      render();
+      toTop();
+      focusWord();
+    } else {
+      state.screen = 'final';
+      state.finishedAt = Date.now();
+      render();
+      toTop();
+    }
+  }
+
+  $('btn-start').addEventListener('click', startGame);
+  $('btn-again').addEventListener('click', startGame);
+  $('btn-next').addEventListener('click', next);
+  $('btn-room').addEventListener('click', leaveRoom);
+  $('q-opts').addEventListener('click', (e) => {
+    const b = e.target.closest('.opt');
+    if (b && !b.disabled) answer(b.dataset.g);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (state.screen !== 'q' || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (!answered(curId())) {
+      const k = '123'.indexOf(e.key);
+      if (k >= 0) { e.preventDefault(); answer(OPTS[k]); }
+    } else if (e.key === 'Enter' && !(document.activeElement && document.activeElement.tagName === 'BUTTON')) {
+      e.preventDefault();
+      next();
+    }
+  });
+
+  const copyBtn = $('btn-copy');
+  copyBtn.addEventListener('click', async () => {
+    const text = `Мій результат у грі «Кімната роду» (рід незмінюваних іменників): ${score()}/${TOTAL} 💜`;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Скопійовано';
+      setTimeout(() => { copyBtn.textContent = 'Скопіювати результат'; }, 2000);
+    } catch (err) {
+      $('copyfall').hidden = false;
+      const ta = $('copytext');
+      ta.value = text;
+      ta.focus();
+      ta.select();
+    }
+  });
+
+  /* ---------- brand dot matrix on purple heroes ---------- */
+  function pill(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fill();
+  }
+  function drawMatrix(cv) {
+    const box = cv.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(box.width * dpr);
+    cv.height = Math.round(box.height * dpr);
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, box.width, box.height);
+    ctx.fillStyle = '#fff';
+    let seed = 20261121;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const step = 17;
+    const r = 4.2;
+    const cols = Math.ceil(box.width / step);
+    const rows = Math.ceil(box.height / step);
+    for (let c = 0; c < cols; c++) {
+      let skip = 0;
+      for (let j = 0; j < rows; j++) {
+        const v = rnd();
+        const k = rnd();
+        if (skip) { skip--; continue; }
+        const x = c * step + step / 2;
+        const y = j * step + step / 2;
+        const u = x / box.width;
+        const t = y / box.height;
+        const dens = Math.max(u * (1 - t), (1 - u) * t);
+        if (v > Math.pow(dens, 1.5) * 1.45) continue;
+        ctx.globalAlpha = 0.07 + 0.13 * dens;
+        if (k < 0.16 && j < rows - 2) { pill(ctx, x - r, y - r, 2 * r, 2 * r + step * 2, r); skip = 2; }
+        else if (k < 0.3 && j < rows - 1) { pill(ctx, x - r, y - r, 2 * r, 2 * r + step, r); skip = 1; }
+        else { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  function drawAll() {
+    document.querySelectorAll('.screen:not([hidden]) canvas.matrix').forEach(drawMatrix);
+  }
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(() => drawAll());
+    document.querySelectorAll('.hero').forEach((h) => ro.observe(h));
+  } else {
+    window.addEventListener('resize', drawAll);
+  }
+
+  /* ---------- keep the player's place across a republish ---------- */
+  const hot = window.claude && window.claude.hot;
+  if (hot && typeof hot.snapshot === 'function') hot.snapshot(() => state);
+  function boot(data) {
+    if (valid(data)) state = data;
+    render();
+  }
+  if (hot && typeof hot.ready === 'function') hot.ready(boot);
+  else boot(hot && hot.data ? hot.data : {});
+})();
+</script>
+</body>
+</html>
